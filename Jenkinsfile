@@ -27,4 +27,16 @@ node {
         sh "docker login -u ${env.DOCKERHUB_USERNAME} -p ${env.DOCKERHUB_PASSWORD} -e slads2000-dockerhub@yahoo.com.au"
         sh "docker push slads2000/qcon:${gitCommit()}"
     }
+
+    // Deploy
+    stage 'Deploy'
+
+    marathon(
+        url: 'http://marathon.mesos:8080',
+        forceUpdate: false,
+        credentialsId: 'dcos-token',
+        filename: 'marathon.json',
+        appId: 'nginx-senglin',
+        docker: "slads2000/qcon:${gitCommit()}".toString()
+    )
 }
